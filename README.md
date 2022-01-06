@@ -70,6 +70,10 @@ Over systemd timers:
 
 * `-n`: dry-run, print the next 5 times the command would run.
 * `-v`: verbose, print scheduled (and rescheduled) times.
+* `-t`: timefile, look for matching times starting from the mtime of timefile
+  rather than now.
+* `-T`: timewait, ensure there is at least TIMEWAIT seconds between now (or
+  the mtime of the timefile, if it is given) and execution.
 * `-t`, `-T`: see below timefiles
 * `-R`: add between 0 and RANDDELAY seconds to the start of the scheduled time.
 * `-J`: add between 0 and JITTER seconds to scheduled execution time.
@@ -108,17 +112,13 @@ Friday the 13th.
 
 ## Timefiles
 
-Optionally, you can keep track of runs in time files, using `-t` and
-optionally `-T`.
+Optionally, you can keep track of runs in time files, using `-t`.
 
-When `-T` is passed, execution will not start earlier than the mtime
-of TIMEFILE plus TIMEWAIT seconds.
-
-When `-T` is *not* passed, snooze will start finding the first matching time
-starting from the mtime of TIMEFILE, and taking SLACK into account.
-(E.g. `-H0 -s 1d -t timefile` will start an instant
-execution when timefile has not been touched today, whereas without `-t`
-this would always wait until next midnight.)
+When `-t` is passed, snooze will start finding the first matching time
+starting from the mtime of TIMEFILE (rather than the current second), and
+taking SLACK and TIMEWAIT into account. (E.g. `-H0 -s 1d -t timefile` will
+start an instant execution when timefile has not been touched today, whereas
+without `-t` this would always wait until next midnight.)
 
 If TIMEFILE does not exist, it will be assumed outdated enough to
 ensure earliest execution.
@@ -130,7 +130,8 @@ Only mtime is looked at, so touch(1) is good.
 
 * snooze parses the option flags and computes the first time the
   date pattern matches, as a symbolic date
-* if a timefile is specified, the time is upped to timefile + timewait seconds
+* if a timefile is specified, the time is changed to timefile + timewait
+  seconds
 * if a random delay is requested, it is added
 * snooze computes how far this event is in the future
 * snooze sleeps that long, but at most 5 minutes

@@ -26,7 +26,7 @@ static long slack = 60;
 #define SLEEP_PHASE 300
 static int nflag, vflag;
 
-static int timewait = -1;
+static int timewait = 0;
 static int randdelay = 0;
 static int jitter = 0;
 static char *timefile;
@@ -285,25 +285,21 @@ main(int argc, char *argv[])
 			exit(2);
 		}
 
-	time_t start = now + 1;
+	time_t start = now + timewait + 1;
 
 	if (timefile) {
 		struct stat st;
 		if (stat(timefile, &st) < 0) {
 			if (errno != ENOENT)
 				perror("stat");
-			t = start - slack - 1 - timewait;
+			/* Not adding timewait will ensure earliest execution. */
+			t = start - slack - 1;
 		} else {
-			t = st.st_mtime + 1;
+			t = st.st_mtime + timewait + 1;
 		}
-		if (timewait == -1) {
-			while (t < start - slack)
-				t = find_next(t + 1);
-			start = t;
-		} else {
-			if (t + timewait > start - slack)
-				start = t + timewait;
-		}
+		while (t < start - slack)
+			t = find_next(t + 1);
+		start = t;
 	}
 
 	srand48(getpid() ^ start);
