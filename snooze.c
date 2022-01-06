@@ -304,8 +304,7 @@ main(int argc, char *argv[])
 		start += timewait;
 	}
 
-	srand48(getpid() ^ start)
-;
+	srand48(getpid() ^ start);
 
 	if (randdelay) {
 		long delay;
