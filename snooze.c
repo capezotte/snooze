@@ -285,21 +285,26 @@ main(int argc, char *argv[])
 			exit(2);
 		}
 
-	time_t start = now + timewait + 1;
+	time_t start = now + 1;
 
 	if (timefile) {
+
 		struct stat st;
+
 		if (stat(timefile, &st) < 0) {
 			if (errno != ENOENT)
 				perror("stat");
-			/* Not adding timewait will ensure earliest execution. */
 			t = start - slack - 1;
 		} else {
 			t = st.st_mtime + timewait + 1;
 		}
+
 		while (t < start - slack)
 			t = find_next(t + 1);
+
 		start = t;
+	} else {
+		start += timewait;
 	}
 
 	srand48(getpid() ^ start);
