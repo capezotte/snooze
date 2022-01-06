@@ -288,9 +288,7 @@ main(int argc, char *argv[])
 	time_t start = now + 1;
 
 	if (timefile) {
-
 		struct stat st;
-
 		if (stat(timefile, &st) < 0) {
 			if (errno != ENOENT)
 				perror("stat");
@@ -298,7 +296,6 @@ main(int argc, char *argv[])
 		} else {
 			t = st.st_mtime + timewait + 1;
 		}
-
 		while (t < start - slack)
 			t = find_next(t + 1);
 
